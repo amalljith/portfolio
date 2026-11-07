@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
+import AuroraBackground from './components/aurora/AuroraBackground'
 import { useAccentTheme } from './hooks/useAccentTheme'
 
 export default function App() {
@@ -15,14 +16,7 @@ export default function App() {
   return (
     <div className="portfolio-shell" style={{ '--accent': theme.color }}>
       <a className="skip-link" href="#main">Skip to content</a>
-      <div className="aurora" aria-hidden="true">
-        <div className="aurora__atmosphere" />
-        <div className="aurora__ribbon aurora__ribbon--one" />
-        <div className="aurora__ribbon aurora__ribbon--two" />
-        <div className="aurora__ribbon aurora__ribbon--three" />
-        <div className="aurora__haze" />
-        <div className="aurora__stars" />
-      </div>
+      <AuroraBackground accentColor={theme.color} />
       <div className="frame-corners" aria-hidden="true"><i /><i /><i /><i /></div>
       <Navbar theme={theme} onThemeChange={setTheme} onUpcoming={announceUpcoming} />
       <Hero onUpcoming={announceUpcoming} />

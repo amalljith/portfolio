@@ -23,9 +23,15 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--color-paper); o
 .skip-link { position: absolute; z-index: 20; left: var(--gutter); top: 12px; padding: 12px 20px; color: #050805; background: var(--accent); transform: translateY(-160%); }
 .skip-link:focus { transform: translateY(0); }
 
-/* CSS-only atmosphere. This decorative layer can later host the aurora shader. */
-.aurora { position: absolute; z-index: -2; inset: 0; overflow: hidden; pointer-events: none; filter: saturate(2); }
-.aurora::before { content: ""; position: absolute; width: 55%; height: 125%; right: -11%; top: -34%; border-radius: 50%; transform: rotate(33deg); background: radial-gradient(ellipse, transparent 49%, color-mix(in srgb, var(--accent) 20%, transparent) 54%, color-mix(in srgb, var(--accent) 75%, transparent) 56%, transparent 64%); mask-image: linear-gradient(0deg, transparent 5%, #000 45% 75%, transparent 98%); filter: blur(18px); opacity: .65; }
+/* Loading starts dark. The CSS aurora appears only for reduced motion while
+   loading, or as a fallback when WebGL fails; the shader owns the entrance. */
+.aurora { position: absolute; z-index: -2; inset: 0; overflow: hidden; pointer-events: none; }
+.aurora-fallback { position: absolute; inset: 0; filter: saturate(2); opacity: 0; transition: opacity 300ms ease; }
+.aurora[data-fallback="true"] .aurora-fallback,
+.aurora[data-reduced-motion="true"][data-ready="false"] .aurora-fallback { opacity: 1; }
+.aurora .aurora-canvas { position: absolute !important; inset: 0; pointer-events: none !important; }
+.aurora canvas { display: block; pointer-events: none; }
+.aurora-fallback::before { content: ""; position: absolute; width: 55%; height: 125%; right: -11%; top: -34%; border-radius: 50%; transform: rotate(33deg); background: radial-gradient(ellipse, transparent 49%, color-mix(in srgb, var(--accent) 20%, transparent) 54%, color-mix(in srgb, var(--accent) 75%, transparent) 56%, transparent 64%); mask-image: linear-gradient(0deg, transparent 5%, #000 45% 75%, transparent 98%); filter: blur(18px); opacity: .65; }
 .aurora__atmosphere { position: absolute; inset: 0; background: radial-gradient(ellipse at 92% 25%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 44%), radial-gradient(ellipse at 58% 90%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 42%), linear-gradient(100deg, #050805 5%, transparent 60%); }
 .aurora__ribbon { position: absolute; border-radius: 50%; }
 .aurora__ribbon--one {
@@ -318,7 +324,7 @@ h1 {
   .aurora__ribbon--two { width: 230%; height: 65%; left: -26%; top: 38%; transform: rotate(-35deg); opacity: .65; }
   .aurora__ribbon--three { width: 210%; left: -70%; opacity: .3; }
   .aurora__haze { background: linear-gradient(90deg, #05080599, transparent), linear-gradient(0deg, #05080566, #05080522 40%, #05080544); }
-  .aurora::before { opacity: .3; }
+  .aurora-fallback::before { opacity: .3; }
 }
 
 @media (max-width: 380px) {
