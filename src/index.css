@@ -205,8 +205,8 @@ h1 {
   position: absolute;
   left: 50%;
   top: .08em;
-  width: calc(.7em * var(--pixel-ratio));
-  height: .7em;
+  width: calc(.68em * var(--pixel-ratio));
+  height: .68em;
   transform: translateX(-50%);
   overflow: visible;
   opacity: var(--pixel-amount);
