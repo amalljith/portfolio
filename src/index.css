@@ -195,7 +195,7 @@ h1 {
 .headline-accent { color: var(--accent); margin-top: 8px; }
 
 /* Geometry stays in the clean letter's flow box. Pixel layers never reflow
-   the line; --pixel-amount is the per-character hook for a future morph. */
+   the line; --pixel-amount blends the original clean and SVG glyphs. */
 .hybrid-text { display: inline; }
 .hybrid-text__visual { display: inline; font-kerning: none; font-variant-ligatures: none; }
 .type-space { display: inline-block; width: .22em; }
@@ -215,6 +215,14 @@ h1 {
   pointer-events: none;
 }
 .hero-name .type-glyph__pixel { top: .19em; }
+
+.caustics-canvas { position: fixed; inset: 0; z-index: 6; width: 100%; height: 100%; pointer-events: none; opacity: 0; }
+.caustics-playing { opacity: var(--caustics-dom-opacity, 0) !important; }
+.caustics-playing::selection, .caustics-playing ::selection { background: var(--accent); color: var(--color-ink); }
+@media (prefers-reduced-motion: reduce) {
+  .caustics-playing { opacity: 1 !important; }
+  .caustics-canvas { display: none; }
+}
 .headline-orbit { position: absolute; width: 112%; height: 67%; left: -5%; top: 21%; border: 1px solid color-mix(in srgb, var(--accent) 65%, transparent); border-radius: 50%; transform: rotate(-15deg); mask-image: linear-gradient(105deg, #000, transparent 18% 79%, #000); }
 .headline-orbit span { position: absolute; right: 4%; top: 70%; width: 7px; height: 7px; background: var(--accent); box-shadow: 0 0 8px 3px var(--accent), 0 0 22px 7px color-mix(in srgb, var(--accent) 35%, transparent); transform: rotate(45deg); }
 .hero-description { margin: clamp(24px, 3.6svh, 36px) 0 0; font-size: clamp(21px, 1.65vw, 28px); font-weight: 400; line-height: 1.4; letter-spacing: .015em; color: #d8ded3; }

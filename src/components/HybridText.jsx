@@ -1,5 +1,5 @@
 // Original single-cell strokes inspired by the supplied typography references.
-// Both layers keep a stable slot for a future per-character pixel morph.
+// Clean letters define stable slots; selected SVG glyphs preserve the pixel art.
 const PIXEL_GLYPHS = {
   A: ['001100', '010010', '100001', '100001', '011110', '100001', '100001'],
   D: ['111100', '100010', '100001', '100001', '100001', '100010', '111100'],
