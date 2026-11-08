@@ -40,7 +40,7 @@ function useMediaPreference(query) {
   return matches;
 }
 
-export default function AuroraBackground({ accentColor }) {
+export default function AuroraBackground({ primaryColor, secondaryColor }) {
   const rootRef = useRef(null);
   const pointer = useRef({ x: 0.75, y: 0.45, activeUntil: 0 });
   const reducedMotion = useMediaPreference("(prefers-reduced-motion: reduce)");
@@ -76,33 +76,38 @@ export default function AuroraBackground({ accentColor }) {
   }, []);
 
   useEffect(() => {
-    if (reducedMotion || !visible || !inView || failed) return;
+    if (compact || reducedMotion || !visible || !inView || failed) return;
+    const pointerState = pointer.current;
     function onPointerMove(event) {
       if (event.pointerType !== "mouse") return;
       const bounds = rootRef.current?.getBoundingClientRect();
       if (!bounds?.width || !bounds.height) return;
       const x = (event.clientX - bounds.left) / bounds.width;
       const y = 1 - (event.clientY - bounds.top) / bounds.height;
-      if (x < 0 || x > 1 || y < 0 || y > 1) return;
-      pointer.current.x = x;
-      pointer.current.y = y;
-      pointer.current.activeUntil = performance.now() + 1200;
+      if (x < 0 || x > 1 || y < 0 || y > 1) {
+        pointerState.activeUntil = 0;
+        return;
+      }
+      pointerState.x = x;
+      pointerState.y = y;
+      pointerState.activeUntil = performance.now() + 1200;
     }
     const onPointerLeave = (event) => {
-      if (!event.relatedTarget) pointer.current.activeUntil = 0;
+      if (!event.relatedTarget) pointerState.activeUntil = 0;
     };
     const onBlur = () => {
-      pointer.current.activeUntil = 0;
+      pointerState.activeUntil = 0;
     };
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerout", onPointerLeave, { passive: true });
     window.addEventListener("blur", onBlur);
     return () => {
+      pointerState.activeUntil = 0;
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerout", onPointerLeave);
       window.removeEventListener("blur", onBlur);
     };
-  }, [failed, inView, reducedMotion, visible]);
+  }, [compact, failed, inView, reducedMotion, visible]);
 
   return (
     <div
@@ -114,18 +119,15 @@ export default function AuroraBackground({ accentColor }) {
       data-reduced-motion={reducedMotion}
     >
       <div className="aurora-fallback">
-        <div className="aurora__atmosphere" />
-        <div className="aurora__ribbon aurora__ribbon--one" />
-        <div className="aurora__ribbon aurora__ribbon--two" />
-        <div className="aurora__ribbon aurora__ribbon--three" />
-        <div className="aurora__haze" />
-        <div className="aurora__stars" />
+        <div className="aurora__streams" />
+        <div className="aurora__specks" />
       </div>
       {!failed && (
         <AuroraErrorBoundary onFailure={onFailure}>
           <Suspense fallback={null}>
             <AuroraScene
-              accentColor={accentColor}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
               active={visible && inView}
               compact={compact}
               reducedMotion={reducedMotion}

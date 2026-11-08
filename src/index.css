@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+@property --energy-primary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #afec00;
+}
+
+@property --energy-secondary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #10b981;
+}
+
 @theme {
   --font-display: "Clash Display", "Arial Black", "Helvetica Neue", sans-serif;
   --font-sans: "Cabinet Grotesk", "Helvetica Neue", Arial, sans-serif;
@@ -18,39 +30,22 @@ a { color: inherit; text-decoration: none; }
 button:focus-visible, a:focus-visible { outline: 2px solid var(--color-paper); outline-offset: 7px; }
 ::selection { background: var(--accent, var(--color-acid-lime)); color: var(--color-ink); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-.portfolio-shell { --accent: var(--color-acid-lime); --gutter: clamp(28px, 6.5vw, 120px); position: relative; isolation: isolate; min-height: 100svh; overflow: clip; background: #050805; }
+.portfolio-shell { --accent: var(--color-acid-lime); --gutter: clamp(28px, 6.5vw, 120px); position: relative; isolation: isolate; min-height: 100svh; overflow: clip; background: #050805; transition: --energy-primary 800ms ease, --energy-secondary 800ms ease; }
 .page-gutter { padding-inline: var(--gutter); }
 .skip-link { position: absolute; z-index: 20; left: var(--gutter); top: 12px; padding: 12px 20px; color: #050805; background: var(--accent); transform: translateY(-160%); }
 .skip-link:focus { transform: translateY(0); }
 
-/* Loading starts dark. The CSS aurora appears only for reduced motion while
+/* Loading starts dark. Static energy trails appear only for reduced motion while
    loading, or as a fallback when WebGL fails; the shader owns the entrance. */
-.aurora { position: absolute; z-index: -2; inset: 0; overflow: hidden; pointer-events: none; }
-.aurora-fallback { position: absolute; inset: 0; filter: saturate(2); opacity: 0; transition: opacity 300ms ease; }
+.aurora { --energy-x: 63%; --energy-y: 72%; --energy-highlight: color-mix(in srgb, var(--energy-primary) 35%, white); position: absolute; z-index: -2; inset: 0; overflow: hidden; pointer-events: none; }
+.aurora-fallback { position: absolute; inset: 0; opacity: 0; transition: opacity 300ms ease; background: radial-gradient(ellipse at var(--energy-x) var(--energy-y), color-mix(in srgb, var(--energy-primary) 22%, transparent), transparent 30%), radial-gradient(ellipse at 88% 45%, color-mix(in srgb, var(--energy-secondary) 32%, transparent), transparent 65%); mask-image: linear-gradient(90deg, transparent 38%, #000 70%); }
 .aurora[data-fallback="true"] .aurora-fallback,
 .aurora[data-reduced-motion="true"][data-ready="false"] .aurora-fallback { opacity: 1; }
 .aurora .aurora-canvas { position: absolute !important; inset: 0; pointer-events: none !important; }
 .aurora canvas { display: block; pointer-events: none; }
-.aurora-fallback::before { content: ""; position: absolute; width: 55%; height: 125%; right: -11%; top: -34%; border-radius: 50%; transform: rotate(33deg); background: radial-gradient(ellipse, transparent 49%, color-mix(in srgb, var(--accent) 20%, transparent) 54%, color-mix(in srgb, var(--accent) 75%, transparent) 56%, transparent 64%); mask-image: linear-gradient(0deg, transparent 5%, #000 45% 75%, transparent 98%); filter: blur(18px); opacity: .65; }
-.aurora__atmosphere { position: absolute; inset: 0; background: radial-gradient(ellipse at 92% 25%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 44%), radial-gradient(ellipse at 58% 90%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 42%), linear-gradient(100deg, #050805 5%, transparent 60%); }
-.aurora__ribbon { position: absolute; border-radius: 50%; }
-.aurora__ribbon--one {
-  width: 108%; height: 100%; left: 24%; top: -38%; transform: rotate(-38deg);
-  background: conic-gradient(from 35deg, transparent 0 30%, color-mix(in srgb, var(--accent) 22%, transparent) 39%, var(--accent) 46%, color-mix(in srgb, var(--accent) 85%, var(--color-paper)) 49%, color-mix(in srgb, var(--accent) 40%, transparent) 53%, transparent 62%);
-  mask-image: radial-gradient(ellipse, transparent 53%, #000 56%, #000 57%, transparent 64%); filter: blur(12px); opacity: .9;
-}
-.aurora__ribbon--two {
-  width: 118%; height: 73%; left: 22%; top: 12%; transform: rotate(-31deg);
-  background: conic-gradient(from 45deg, transparent 0 28%, color-mix(in srgb, var(--accent) 20%, transparent) 34%, var(--accent) 43%, color-mix(in srgb, var(--accent) 85%, var(--color-paper)) 46%, color-mix(in srgb, var(--accent) 35%, transparent) 51%, transparent 60%);
-  mask-image: radial-gradient(ellipse, transparent 46%, #000 50%, #000 51%, transparent 63%); filter: blur(17px); opacity: .8;
-}
-.aurora__ribbon--three {
-  width: 122%; height: 60%; left: -7%; top: 64%; transform: rotate(-28deg);
-  background: conic-gradient(from 200deg, transparent 0 29%, color-mix(in srgb, var(--accent) 13%, transparent) 37%, color-mix(in srgb, var(--accent) 75%, transparent) 47%, transparent 60%);
-  mask-image: radial-gradient(ellipse, transparent 49%, #000 54%, transparent 66%); filter: blur(16px); opacity: .55;
-}
-.aurora__haze { position: absolute; inset: 0; background: radial-gradient(ellipse at 73% 60%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 25%), linear-gradient(90deg, #050805 0%, #050805c9 29%, transparent 61%), linear-gradient(0deg, #05080580, transparent 24%, transparent 82%, #05080555); }
-.aurora__stars { position: absolute; inset: 0; opacity: .65; background-image: radial-gradient(circle, var(--accent) .7px, transparent 1px), radial-gradient(circle, #efffdc .5px, transparent 1px); background-size: 343px 297px, 509px 397px; background-position: 50px 67px, 230px 130px; mask-image: linear-gradient(90deg, transparent 36%, #000 77%, transparent); }
+.aurora-fallback::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 10px 22px at var(--energy-x) var(--energy-y), var(--energy-highlight) 2%, var(--energy-primary) 20%, transparent 100%), radial-gradient(circle at var(--energy-x) var(--energy-y), color-mix(in srgb, var(--energy-primary) 60%, transparent), transparent 65px); }
+.aurora__streams { position: absolute; inset: 0; background: repeating-conic-gradient(from 8deg at var(--energy-x) var(--energy-y), transparent 0deg 4deg, color-mix(in srgb, var(--energy-primary) 55%, var(--energy-secondary)) 4.1deg 4.3deg, transparent 4.8deg 9deg); mask-image: linear-gradient(90deg, transparent 60%, #000 68%), radial-gradient(ellipse at var(--energy-x) var(--energy-y), #000 4%, transparent 72%); mask-composite: intersect; opacity: .5; filter: blur(.7px); }
+.aurora__specks { position: absolute; inset: 0; background-image: radial-gradient(circle, var(--energy-highlight) 1px, transparent 2.5px), radial-gradient(circle, var(--energy-secondary) .6px, transparent 1px), radial-gradient(circle, var(--energy-primary) 2px, transparent 5px); background-size: 223px 191px, 127px 109px, 397px 347px; background-position: 31px 67px, 71px 9px, 113px 183px; mask-image: linear-gradient(90deg, transparent 55%, #000 82%); opacity: .22; }
 .frame-corners { position: absolute; z-index: -1; inset: 29px 31px; pointer-events: none; }
 .frame-corners i { position: absolute; width: 21px; height: 21px; border-color: #f5f5f040; border-style: solid; }
 .frame-corners i:nth-child(1) { top: 0; left: 0; border-width: 1px 0 0 1px; }
@@ -268,8 +263,6 @@ h1 {
   .nav-link { padding-inline: 20px; }
   .hero-name { font-size: 32px; }
   .hero-description { font-size: 22px; }
-  .aurora__ribbon--one { left: 32%; width: 130%; }
-  .aurora__ribbon--two { left: 18%; width: 145%; }
 }
 
 /* Preserve breathing room on laptops without forcing vertical overflow. */
@@ -320,11 +313,8 @@ h1 {
   .scroll-link { gap: 0; }
   .scroll-link > span:first-child { display: none; }
   .scroll-link__icon { width: 36px; height: 36px; }
-  .aurora__ribbon--one { width: 210%; height: 90%; left: -12%; top: -13%; transform: rotate(-48deg); opacity: .65; }
-  .aurora__ribbon--two { width: 230%; height: 65%; left: -26%; top: 38%; transform: rotate(-35deg); opacity: .65; }
-  .aurora__ribbon--three { width: 210%; left: -70%; opacity: .3; }
-  .aurora__haze { background: linear-gradient(90deg, #05080599, transparent), linear-gradient(0deg, #05080566, #05080522 40%, #05080544); }
-  .aurora-fallback::before { opacity: .3; }
+  .aurora { --energy-x: 84%; --energy-y: 78%; }
+  .aurora__streams, .aurora__specks { opacity: .3; }
 }
 
 @media (max-width: 380px) {

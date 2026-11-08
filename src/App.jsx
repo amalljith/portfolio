@@ -14,9 +14,9 @@ export default function App() {
   }
 
   return (
-    <div className="portfolio-shell" style={{ '--accent': theme.color }}>
+    <div className="portfolio-shell" style={{ '--accent': theme.color, '--energy-primary': theme.energyPrimary, '--energy-secondary': theme.energySecondary }}>
       <a className="skip-link" href="#main">Skip to content</a>
-      <AuroraBackground accentColor={theme.color} />
+      <AuroraBackground primaryColor={theme.energyPrimary} secondaryColor={theme.energySecondary} />
       <div className="frame-corners" aria-hidden="true"><i /><i /><i /><i /></div>
       <Navbar theme={theme} onThemeChange={setTheme} onUpcoming={announceUpcoming} />
       <Hero onUpcoming={announceUpcoming} />
