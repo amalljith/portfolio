@@ -4,7 +4,7 @@ import Icon from './Icon'
 
 const NAV_LINKS = ['Work', 'About', 'Skills', 'Contact']
 
-export default function Navbar({ theme, onThemeChange, onUpcoming }) {
+export default function Navbar({ theme, onThemeChange, onUpcoming, onAbout }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuButtonRef = useRef(null)
   const headerRef = useRef(null)
@@ -40,7 +40,10 @@ export default function Navbar({ theme, onThemeChange, onUpcoming }) {
       </a>
       <nav className={`navigation${isMenuOpen ? ' navigation--open' : ''}`} id="primary-navigation" aria-label="Main navigation">
         {NAV_LINKS.map((label, index) => (
-          <a key={label} className={`nav-link${index === 0 ? ' nav-link--featured' : ''}`} href={`#${label.toLowerCase()}`} aria-disabled="true" aria-label={`${label}, coming soon`} title={`${label} — coming soon`} onClick={(event) => onUpcoming(event, label)}>{label}</a>
+          <a key={label} className={`nav-link${index === 0 ? ' nav-link--featured' : ''}`} href={`#${label.toLowerCase()}`} aria-disabled={label === 'About' ? undefined : true} aria-label={label === 'About' ? 'About' : `${label}, coming soon`} title={label === 'About' ? undefined : `${label} — coming soon`} onClick={(event) => {
+            if (label === 'About') { setIsMenuOpen(false); onAbout(event) }
+            else onUpcoming(event, label)
+          }}>{label}</a>
         ))}
       </nav>
       <div className="navbar__actions">

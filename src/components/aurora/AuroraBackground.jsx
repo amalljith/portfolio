@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import useAuroraSections from "../../hooks/useAuroraSections";
 
 const AuroraScene = lazy(() => import("./AuroraScene"));
 
@@ -42,11 +43,11 @@ function useMediaPreference(query) {
 
 export default function AuroraBackground({ primaryColor, secondaryColor, entranceEnabled = true }) {
   const rootRef = useRef(null);
+  const sectionControls = useAuroraSections(rootRef);
   const pointer = useRef({ x: 0.75, y: 0.45, activeUntil: 0 });
   const reducedMotion = useMediaPreference("(prefers-reduced-motion: reduce)");
   const compact = useMediaPreference("(max-width: 700px), (pointer: coarse)");
   const [visible, setVisible] = useState(() => !document.hidden);
-  const [inView, setInView] = useState(true);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const onReady = useCallback(() => setReady(true), []);
@@ -61,22 +62,13 @@ export default function AuroraBackground({ primaryColor, secondaryColor, entranc
       pointer.current.activeUntil = 0;
     };
     document.addEventListener("visibilitychange", onVisibility);
-    const observer =
-      typeof IntersectionObserver === "function"
-        ? new IntersectionObserver(
-            ([entry]) => setInView(entry.isIntersecting),
-            { threshold: 0 },
-          )
-        : null;
-    if (rootRef.current) observer?.observe(rootRef.current);
     return () => {
       document.removeEventListener("visibilitychange", onVisibility);
-      observer?.disconnect();
     };
   }, []);
 
   useEffect(() => {
-    if (compact || reducedMotion || !visible || !inView || failed) return;
+    if (compact || reducedMotion || !visible || failed) return;
     const pointerState = pointer.current;
     function onPointerMove(event) {
       if (event.pointerType !== "mouse") return;
@@ -107,28 +99,29 @@ export default function AuroraBackground({ primaryColor, secondaryColor, entranc
       window.removeEventListener("pointerout", onPointerLeave);
       window.removeEventListener("blur", onBlur);
     };
-  }, [compact, failed, inView, reducedMotion, visible]);
+  }, [compact, failed, reducedMotion, visible]);
 
   return (
     <div
       className="aurora"
       ref={rootRef}
       aria-hidden="true"
-      data-ready={ready && !failed}
-      data-fallback={failed}
+      data-ready={ready && !failed && !reducedMotion}
+      data-fallback={failed || reducedMotion}
       data-reduced-motion={reducedMotion}
     >
       <div className="aurora-fallback">
         <div className="aurora__streams" />
         <div className="aurora__specks" />
       </div>
-      {!failed && (
+      {!failed && !reducedMotion && (
         <AuroraErrorBoundary onFailure={onFailure}>
           <Suspense fallback={null}>
             <AuroraScene
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
-              active={visible && inView && entranceEnabled}
+              active={visible && entranceEnabled}
+              sectionControls={sectionControls}
               compact={compact}
               reducedMotion={reducedMotion}
               pointer={pointer}

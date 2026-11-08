@@ -6,11 +6,13 @@ import { useAccentTheme } from "./hooks/useAccentTheme";
 import HeroCaustics from "./components/caustics/HeroCaustics";
 import CustomCursor from "./components/CustomCursor";
 import CinematicPreloader from "./components/CinematicPreloader";
+import AboutSection from "./components/about/AboutSection";
 
 export default function App() {
   const { theme, setTheme } = useAccentTheme();
   const [notice, setNotice] = useState("");
   const heroRef = useRef(null);
+  const heroStageRef = useRef(null);
   const focusHero = useRef(false);
   const [intro, setIntro] = useState(() =>
     window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "complete" : "loading"
@@ -30,6 +32,19 @@ export default function App() {
   function announceUpcoming(event, label) {
     event.preventDefault();
     setNotice(`${label} is not available yet.`);
+  }
+
+  function navigateToAbout(event) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const about = document.getElementById("about");
+    if (!about) return;
+    event.preventDefault();
+    if (window.location.hash !== "#about") history.pushState(history.state, "", "#about");
+    about.focus({ preventScroll: true });
+    about.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+      block: "start",
+    });
   }
 
   return (
@@ -53,19 +68,25 @@ export default function App() {
           primaryColor={theme.energyPrimary}
           secondaryColor={theme.energySecondary}
         />
-        <div className="frame-corners" aria-hidden="true">
-          <i />
-          <i />
-          <i />
-          <i />
-        </div>
-        <Navbar
-          theme={theme}
-          onThemeChange={setTheme}
-          onUpcoming={announceUpcoming}
-        />
-        <Hero onUpcoming={announceUpcoming} />
-        <HeroCaustics enabled={intro !== "loading"} />
+        <main id="main" className="portfolio-main" tabIndex={-1}>
+          <div className="hero-stage" ref={heroStageRef} data-aurora-section="hero">
+            <div className="frame-corners" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <i />
+            </div>
+            <Navbar
+              theme={theme}
+              onThemeChange={setTheme}
+              onUpcoming={announceUpcoming}
+              onAbout={navigateToAbout}
+            />
+            <Hero onUpcoming={announceUpcoming} onAbout={navigateToAbout} />
+          </div>
+          <AboutSection enabled={intro === "complete"} />
+        </main>
+        <HeroCaustics enabled={intro !== "loading"} scopeRef={heroStageRef} />
         {intro === "complete" && <CustomCursor accentColor={theme.color} />}
         <div
           className="sr-only"

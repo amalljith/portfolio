@@ -18,6 +18,12 @@ export const auroraFragmentShader = /* glsl */ `
   uniform vec2 uMouse;
   uniform float uInteraction;
   uniform float uCompact;
+  uniform vec2 uFlowPosition;
+  uniform float uIntensity;
+  uniform float uOpacity;
+  uniform float uParticleVisibility;
+  uniform float uCurvature;
+  uniform float uScroll;
   varying vec2 vUv;
 
   float hash(vec2 p) {
@@ -55,7 +61,7 @@ export const auroraFragmentShader = /* glsl */ `
     float width = clamp(0.42 / max(aspect, 0.4), 0.22, 0.30)
                 * (0.94 + turbulence * 0.12);
     float guide = mix(0.84, 0.94, uCompact)
-                + mix(0.075, 0.035, uCompact) * cos(s * 6.283185);
+                + mix(0.075, 0.035, uCompact) * cos(s * 6.283185) * uCurvature;
     guide += (turbulence - 0.5) * 0.018 + (detail - 0.5) * 0.008;
     float count = mix(28.0, 16.0, uCompact);
     float lane = ((uv.x - guide) / width + 0.5) * count;
@@ -124,7 +130,7 @@ export const auroraFragmentShader = /* glsl */ `
       // unchanged steady-flow particles. No phase or material clock resets.
       vec3 spark = sparkTint * head * handoff * (core * 0.95 + halo * 0.15) * step(0.62, random);
       spark += tint * entranceHead * (core * 0.55 + halo * 0.12) * step(0.45, random);
-      light += (trackTint * energy + spark) * track * mix(0.22, 1.0, depth) * revealed;
+      light += (trackTint * energy + spark * uParticleVisibility) * track * mix(0.22, 1.0, depth) * revealed;
     }
 
     // Broad, uneven light between fibers binds them into a luminous volume.
@@ -168,7 +174,9 @@ export const auroraFragmentShader = /* glsl */ `
     float spread = progress * progress * progress * (progress * (progress * 6.0 - 15.0) + 10.0);
     float aspect = uResolution.x / max(uResolution.y, 1.0);
     // The composition is anchored throughout the entrance; only light travels.
-    vec2 uv = vUv;
+    vec2 uv = vUv - uFlowPosition;
+    // A small reversible scroll drift; the original material clock keeps running.
+    uv.y += sin(uScroll * 0.24) * 0.012;
     vec2 mouseDistance = (vUv - uMouse) * vec2(aspect, 1.0);
     float influence = exp(-dot(mouseDistance, mouseDistance) * 10.0) * uInteraction;
     uv += (uMouse - vec2(0.75, 0.45)) * 0.012 * uInteraction;
@@ -182,8 +190,8 @@ export const auroraFragmentShader = /* glsl */ `
     if (vUv.x > 0.42) {
       field = streamRiver(uv, aspect, progress, tint, deepTint);
 
-      field += depthMotes(uv, aspect, 0.0, tint) * spread;
-      if (uCompact < 0.5) field += depthMotes(uv, aspect, 1.0, tint) * spread;
+      field += depthMotes(uv, aspect, 0.0, tint) * spread * uParticleVisibility;
+      if (uCompact < 0.5) field += depthMotes(uv, aspect, 1.0, tint) * spread * uParticleVisibility;
 
       // Very low-frequency fog creates depth in the open space between fans.
       // One noise lookup replaces expensive volumetric marching/postprocessing.
@@ -197,11 +205,11 @@ export const auroraFragmentShader = /* glsl */ `
     float composition = smoothstep(0.42, 0.70, vUv.x);
     float textProtection = 1.0 - 0.65 * (1.0 - smoothstep(0.55, 0.85, vUv.x))
                                * smoothstep(0.28, 0.5, vUv.y);
-    field *= composition * textProtection * mix(1.0, 0.65, uCompact);
+    field *= composition * textProtection * mix(1.0, 0.65, uCompact) * uIntensity;
 
     vec3 color = vec3(0.0008, 0.0012, 0.0018) + field;
     color += (hash(gl_FragCoord.xy) - 0.5) * 0.0006;
-    gl_FragColor = vec4(max(color, 0.0), 1.0);
+    gl_FragColor = vec4(max(color, 0.0), uOpacity);
     #include <colorspace_fragment>
   }
 `

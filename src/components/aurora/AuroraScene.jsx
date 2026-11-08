@@ -5,8 +5,12 @@ import { auroraFragmentShader, auroraVertexShader } from './auroraShaders'
 
 const GL_OPTIONS = { antialias: false, alpha: true, depth: false, stencil: false, powerPreference: 'low-power' }
 const ENTRANCE_SECONDS = 2.8
+const SECTION_UNIFORMS = [
+  ['uIntensity', 'intensity'], ['uOpacity', 'opacity'],
+  ['uParticleVisibility', 'particles'], ['uCurvature', 'curvature'], ['uScroll', 'scroll'],
+]
 
-function AuroraPlane({ primaryColor, secondaryColor, active, compact, reducedMotion, pointer, onReady, onFailure }) {
+function AuroraPlane({ primaryColor, secondaryColor, active, compact, reducedMotion, pointer, sectionControls, onReady, onFailure }) {
   const size = useThree((state) => state.size)
   const dpr = useThree((state) => state.viewport.dpr)
   const invalidate = useThree((state) => state.invalidate)
@@ -15,6 +19,7 @@ function AuroraPlane({ primaryColor, secondaryColor, active, compact, reducedMot
   const targetPrimary = useMemo(() => new Color(primaryColor), [primaryColor])
   const targetSecondary = useMemo(() => new Color(secondaryColor), [secondaryColor])
   const targetMouse = useMemo(() => new Vector2(0.75, 0.45), [])
+  const targetPosition = useMemo(() => new Vector2(), [])
   const ready = useRef(false)
   const meshRef = useRef(null)
   const materialRef = useRef(null)
@@ -30,6 +35,12 @@ function AuroraPlane({ primaryColor, secondaryColor, active, compact, reducedMot
     uMouse: { value: new Vector2(0.75, 0.45) },
     uInteraction: { value: 0 },
     uCompact: { value: compact ? 1 : 0 },
+    uFlowPosition: { value: new Vector2() },
+    uIntensity: { value: 1 },
+    uOpacity: { value: 1 },
+    uParticleVisibility: { value: 1 },
+    uCurvature: { value: 1 },
+    uScroll: { value: 0 },
   }))
 
   useEffect(() => {
@@ -115,6 +126,14 @@ function AuroraPlane({ primaryColor, secondaryColor, active, compact, reducedMot
       uniforms.uEnergyPrimary.value.lerp(targetPrimary, colorBlend)
       uniforms.uEnergySecondary.value.lerp(targetSecondary, colorBlend)
 
+      // Section targets change the existing field, never its time or entrance.
+      const section = sectionControls.current
+      targetPosition.set(section.x, section.y)
+      uniforms.uFlowPosition.value.lerp(targetPosition, colorBlend)
+      for (const [uniform, key] of SECTION_UNIFORMS) {
+        uniforms[uniform].value += (section[key] - uniforms[uniform].value) * colorBlend
+      }
+
       const activity = Math.max(0, Math.min(1, (pointer.current.activeUntil - now) / 800))
       const isInteracting = activity > 0
       targetMouse.set(isInteracting ? pointer.current.x : 0.75, isInteracting ? pointer.current.y : 0.45)
@@ -155,6 +174,7 @@ function AuroraPlane({ primaryColor, secondaryColor, active, compact, reducedMot
         depthWrite={false}
         depthTest={false}
         toneMapped={false}
+        transparent
       />
     </mesh>
   )

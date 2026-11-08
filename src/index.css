@@ -32,6 +32,8 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--color-paper); o
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .portfolio-shell { --accent: var(--color-acid-lime); --gutter: clamp(28px, 6.5vw, 120px); position: relative; isolation: isolate; min-height: 100svh; overflow: clip; background: #050805; transition: --energy-primary 800ms ease, --energy-secondary 800ms ease; }
 .page-gutter { padding-inline: var(--gutter); }
+.portfolio-main:focus { outline: none; }
+.hero-stage { position: relative; }
 
 /* Decorative pointer UI follows the existing accent and never receives input. */
 .custom-cursor { display: none; position: fixed; z-index: 100; inset: 0; pointer-events: none; opacity: 0; transition: opacity 120ms ease; }
@@ -54,10 +56,10 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--color-paper); o
 
 /* Loading starts dark. Static energy trails appear only for reduced motion while
    loading, or as a fallback when WebGL fails; the shader owns the entrance. */
-.aurora { --energy-x: 63%; --energy-y: 72%; --energy-highlight: color-mix(in srgb, var(--energy-primary) 35%, white); position: absolute; z-index: -2; inset: 0; overflow: hidden; pointer-events: none; }
+.aurora { --energy-x: 63%; --energy-y: 72%; --energy-highlight: color-mix(in srgb, var(--energy-primary) 35%, white); position: fixed; z-index: -2; inset: 0; overflow: hidden; pointer-events: none; }
 .aurora-fallback { position: absolute; inset: 0; opacity: 0; transition: opacity 300ms ease; background: radial-gradient(ellipse at var(--energy-x) var(--energy-y), color-mix(in srgb, var(--energy-primary) 22%, transparent), transparent 30%), radial-gradient(ellipse at 88% 45%, color-mix(in srgb, var(--energy-secondary) 32%, transparent), transparent 65%); mask-image: linear-gradient(90deg, transparent 38%, #000 70%); }
 .aurora[data-fallback="true"] .aurora-fallback,
-.aurora[data-reduced-motion="true"][data-ready="false"] .aurora-fallback { opacity: 1; }
+.aurora[data-reduced-motion="true"] .aurora-fallback { opacity: var(--aurora-fallback-strength, 1); }
 .aurora .aurora-canvas { position: absolute !important; inset: 0; pointer-events: none !important; }
 .aurora canvas { display: block; pointer-events: none; }
 .aurora-fallback::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 10px 22px at var(--energy-x) var(--energy-y), var(--energy-highlight) 2%, var(--energy-primary) 20%, transparent 100%), radial-gradient(circle at var(--energy-x) var(--energy-y), color-mix(in srgb, var(--energy-primary) 60%, transparent), transparent 65px); }

@@ -7,7 +7,7 @@ import { CAUSTICS_SETTINGS, clampIntensity } from './causticsConfig'
 
 gsap.registerPlugin(useGSAP)
 
-export default function HeroCaustics({ intensity = CAUSTICS_SETTINGS.intensity, enabled = true }) {
+export default function HeroCaustics({ intensity = CAUSTICS_SETTINGS.intensity, enabled = true, scopeRef }) {
   const canvasRef = useRef(null)
   const intensityRef = useRef(clampIntensity(intensity))
   const { contextSafe } = useGSAP({ scope: canvasRef })
@@ -19,6 +19,7 @@ export default function HeroCaustics({ intensity = CAUSTICS_SETTINGS.intensity, 
   useEffect(() => {
     const canvas = canvasRef.current
     const root = canvas.closest('.portfolio-shell')
+    const scope = scopeRef?.current ?? root
     if (!enabled) {
       root.dataset.caustics = 'waiting'
       return () => { delete root.dataset.caustics }
@@ -115,7 +116,7 @@ export default function HeroCaustics({ intensity = CAUSTICS_SETTINGS.intensity, 
       if (!alive || reduced.matches || intensityRef.current === 0 || document.hidden || !inView) return
       finish('preparing')
       const current = generation
-      activeTargets = collectTargets(root, selector)
+      activeTargets = collectTargets(scope, selector)
       if (!activeTargets.length) { finish(); return }
       // DOM text remains readable throughout preparation. Slow setup never
       // creates a loading screen or leaves transparent content behind.
@@ -166,7 +167,7 @@ export default function HeroCaustics({ intensity = CAUSTICS_SETTINGS.intensity, 
       inView = entry.isIntersecting
       syncVisibility()
     })
-    intersection.observe(root)
+    intersection.observe(scope)
     const onPreference = () => { if (reduced.matches) finish('reduced') }
     const onLayoutChange = () => {
       if (activeTargets.length) finish()
@@ -223,7 +224,7 @@ export default function HeroCaustics({ intensity = CAUSTICS_SETTINGS.intensity, 
       delete root.dataset.caustics
       delete root.dataset.causticsTargets
     }
-  }, [contextSafe, enabled])
+  }, [contextSafe, enabled, scopeRef])
 
   return <canvas ref={canvasRef} className="caustics-canvas" aria-hidden="true" tabIndex={-1} />
 }
