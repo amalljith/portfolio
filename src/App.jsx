@@ -4,6 +4,7 @@ import Hero from "./components/Hero";
 import AuroraBackground from "./components/aurora/AuroraBackground";
 import { useAccentTheme } from "./hooks/useAccentTheme";
 import HeroCaustics from "./components/caustics/HeroCaustics";
+import CustomCursor from "./components/CustomCursor";
 
 export default function App() {
   const { theme, setTheme } = useAccentTheme();
@@ -43,6 +44,7 @@ export default function App() {
       />
       <Hero onUpcoming={announceUpcoming} />
       <HeroCaustics />
+      <CustomCursor accentColor={theme.color} />
       <div
         className="sr-only"
         role="status"

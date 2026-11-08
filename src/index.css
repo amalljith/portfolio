@@ -32,6 +32,23 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--color-paper); o
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .portfolio-shell { --accent: var(--color-acid-lime); --gutter: clamp(28px, 6.5vw, 120px); position: relative; isolation: isolate; min-height: 100svh; overflow: clip; background: #050805; transition: --energy-primary 800ms ease, --energy-secondary 800ms ease; }
 .page-gutter { padding-inline: var(--gutter); }
+
+/* Decorative pointer UI follows the existing accent and never receives input. */
+.custom-cursor { display: none; position: fixed; z-index: 100; inset: 0; pointer-events: none; opacity: 0; transition: opacity 120ms ease; }
+.custom-cursor, .custom-cursor * { pointer-events: none !important; }
+.custom-cursor__dot, .custom-cursor__follower { position: absolute; top: 0; left: 0; display: block; }
+.custom-cursor__dot { width: 5px; height: 5px; border-radius: 50%; background: var(--cursor-accent); box-shadow: 0 0 8px color-mix(in srgb, var(--cursor-accent) 35%, transparent); transition: background-color 180ms ease, box-shadow 180ms ease; }
+.custom-cursor__follower { width: 32px; height: 32px; }
+.custom-cursor__ring { display: block; width: 100%; height: 100%; border: 1px solid color-mix(in srgb, var(--cursor-accent) 65%, transparent); border-radius: 50%; background: color-mix(in srgb, var(--cursor-accent) 3%, transparent); box-shadow: 0 0 16px color-mix(in srgb, var(--cursor-accent) 8%, transparent); transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease; }
+.custom-cursor[data-hover="true"] .custom-cursor__ring { border-color: color-mix(in srgb, var(--cursor-accent) 75%, white); background: color-mix(in srgb, var(--cursor-accent) 7%, transparent); box-shadow: 0 0 20px color-mix(in srgb, var(--cursor-accent) 15%, transparent); }
+.custom-cursor[data-hover="true"] .custom-cursor__dot { background: color-mix(in srgb, var(--cursor-accent) 80%, white); }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) and (forced-colors: none) {
+  .custom-cursor { display: block; }
+  .custom-cursor[data-visible="true"] { opacity: 1; }
+  html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
+  html.has-custom-cursor :is(input, textarea, select, [contenteditable]:not([contenteditable="false"]), iframe, video[controls], audio[controls], [data-native-cursor]),
+  html.has-custom-cursor :is([contenteditable]:not([contenteditable="false"]), [data-native-cursor]) * { cursor: revert !important; }
+}
 .skip-link { position: absolute; z-index: 20; left: var(--gutter); top: 12px; padding: 12px 20px; color: #050805; background: var(--accent); transform: translateY(-160%); }
 .skip-link:focus { transform: translateY(0); }
 
@@ -229,6 +246,7 @@ h1 {
 .hero-ctas { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(26px, 2.8vw, 44px); margin-top: clamp(28px, 4svh, 40px); }
 
 /* A sliding primary fill and a quieter editorial text link. */
+.magnetic-cta { display: inline-flex; vertical-align: middle; }
 .cta {
   position: relative;
   isolation: isolate;
