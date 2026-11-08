@@ -40,7 +40,7 @@ function useMediaPreference(query) {
   return matches;
 }
 
-export default function AuroraBackground({ primaryColor, secondaryColor }) {
+export default function AuroraBackground({ primaryColor, secondaryColor, entranceEnabled = true }) {
   const rootRef = useRef(null);
   const pointer = useRef({ x: 0.75, y: 0.45, activeUntil: 0 });
   const reducedMotion = useMediaPreference("(prefers-reduced-motion: reduce)");
@@ -128,7 +128,7 @@ export default function AuroraBackground({ primaryColor, secondaryColor }) {
             <AuroraScene
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
-              active={visible && inView}
+              active={visible && inView && entranceEnabled}
               compact={compact}
               reducedMotion={reducedMotion}
               pointer={pointer}

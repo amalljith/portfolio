@@ -7,7 +7,7 @@ import { CAUSTICS_SETTINGS, clampIntensity } from './causticsConfig'
 
 gsap.registerPlugin(useGSAP)
 
-export default function HeroCaustics({ intensity = CAUSTICS_SETTINGS.intensity }) {
+export default function HeroCaustics({ intensity = CAUSTICS_SETTINGS.intensity, enabled = true }) {
   const canvasRef = useRef(null)
   const intensityRef = useRef(clampIntensity(intensity))
   const { contextSafe } = useGSAP({ scope: canvasRef })
@@ -19,6 +19,10 @@ export default function HeroCaustics({ intensity = CAUSTICS_SETTINGS.intensity }
   useEffect(() => {
     const canvas = canvasRef.current
     const root = canvas.closest('.portfolio-shell')
+    if (!enabled) {
+      root.dataset.caustics = 'waiting'
+      return () => { delete root.dataset.caustics }
+    }
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
     if (reduced.matches || intensityRef.current === 0) {
       root.dataset.caustics = reduced.matches ? 'reduced' : 'disabled'
@@ -219,7 +223,7 @@ export default function HeroCaustics({ intensity = CAUSTICS_SETTINGS.intensity }
       delete root.dataset.caustics
       delete root.dataset.causticsTargets
     }
-  }, [contextSafe])
+  }, [contextSafe, enabled])
 
   return <canvas ref={canvasRef} className="caustics-canvas" aria-hidden="true" tabIndex={-1} />
 }

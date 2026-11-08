@@ -1,0 +1,13 @@
+.preloader { position: fixed; z-index: 200; inset: 0; display: grid; place-items: center; min-width: 320px; overflow: hidden; background: #050805; color: #f5f5f0; }
+.preloader__identity { display: flex; flex-direction: column; align-items: center; width: min(72vw, 360px); }
+.preloader__logo { position: relative; font: 600 clamp(120px, 20vw, 230px)/1 var(--font-display); letter-spacing: -.075em; white-space: nowrap; }
+.preloader__logo .type-glyph__pixel { top: .12em; }
+.preloader__logo [data-character="."] { color: var(--accent); }
+.preloader__scan { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(transparent 40%, color-mix(in srgb, var(--accent) 16%, transparent) 49%, color-mix(in srgb, var(--accent) 35%, transparent) 50%, transparent 52%); clip-path: inset(0); }
+.preloader__line { position: relative; width: 112px; height: 1px; margin-top: 32px; overflow: hidden; background: #f5f5f018; }
+.preloader__line-light { position: absolute; inset: 0 auto 0 0; width: 45%; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+.preloader__caption { margin-top: 18px; color: #f5f5f06b; font: 400 8px/1.5 var(--font-mono); letter-spacing: .18em; }
+.preloader__skip { position: absolute; right: clamp(24px, 5vw, 80px); bottom: max(28px, env(safe-area-inset-bottom)); padding: 12px; border: 0; background: transparent; color: #f5f5f08c; font: 400 9px/1 var(--font-mono); letter-spacing: .12em; }
+.preloader__skip span { margin-left: 8px; color: var(--accent); }
+.preloader__skip:hover { color: #f5f5f0; }
+@media (prefers-reduced-motion: reduce) { .preloader__scan { display: none; } }
